@@ -5,14 +5,16 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.gL.assignment.model.Customer;
 import com.gL.assignment.service.impl.CustomerServiceImpl;
+
+/* Class having all mappings and methods to call APIs 
+ * to perform CRUD operations.
+*/
 
 @Controller
 @RequestMapping("/customers")
@@ -23,27 +25,30 @@ public class CustomerController {
 
 	@RequestMapping("/list")
 	public String listCustomers(Model theModel) {
-
+		String returnVal = "";
 		// get the Customers from db;
 		List<Customer> customers = customerServiceImpl.findAll();
-
-		// add to the spring model
-		theModel.addAttribute("Customers", customers);
-
-		return "list-customers";
+		if (customers.size() > 0) {
+			// add to the spring model
+			theModel.addAttribute("Customers", customers);
+			returnVal = "list-customers";
+		} else {
+			returnVal = "error";
+		}
+		return returnVal;
 	}
-	@RequestMapping("/showFormForAdd")
-	public String showFormForAdd(Model theModel) {
+
+	@RequestMapping("/addCustomer")
+	public String addCustomer(Model theModel) {
 		// create model attribute to bind form data.
 		Customer customer = new Customer();
 		theModel.addAttribute("Customer", customer);
 
-		return "Customer-form";
+		return "Customer-form"; // show Customer Form page
 	}
 
-
-	@RequestMapping("/showFormForUpdate")
-	public String showFormForUpdate(@RequestParam("customerId") int theId, Model theModel) {
+	@RequestMapping("/UpdateCustomer")
+	public String UpdateCustomer(@RequestParam("customerId") int theId, Model theModel) {
 
 		// get the customer from the service
 		Customer customer = customerServiceImpl.findById(theId);
@@ -52,7 +57,7 @@ public class CustomerController {
 		theModel.addAttribute("Customer", customer);
 
 		// send over to our form
-		return "Customer-form";
+		return "Customer-form"; // show Customer Form page
 	}
 
 	@PostMapping("/save")
@@ -60,29 +65,41 @@ public class CustomerController {
 			@RequestParam("last_name") String last_name, @RequestParam("email") String email) {
 
 		Customer customer;
-		if (id != 0) {
-			// Update Operation
-			customer = customerServiceImpl.findById(id);
+		String returnVal = "";
 
-			// put updated values to the book object found from database.
-			customer.setFirst_name(first_name);
-			customer.setLast_name(last_name);
-			customer.setEmail(email);
-
+		if (first_name.equals("") || last_name.equals("") || email.equals("")) {
+			returnVal = "missing-page";
 		} else {
-			// Create Operation
-			customer = new Customer(first_name, last_name, email);
-		}
 
-		customerServiceImpl.save(customer);
-		return "redirect:/customers/list";
+			if (id != 0) {
+				/*
+				 * if id is not 0 then it exists inside table already, Update Operation
+				 */
+				customer = customerServiceImpl.findById(id);
+
+				// put updated values to the customer object found from database.
+				customer.setFirst_name(first_name);
+				customer.setLast_name(last_name);
+				customer.setEmail(email);
+
+			} else {
+				/*
+				 * if id is 0 then it doesn't exist inside table, Create Operation
+				 */
+				customer = new Customer(first_name, last_name, email);
+			}
+
+			customerServiceImpl.save(customer);
+			returnVal = "redirect:/customers/list"; // redirect to Customer List Page after operation
+		}
+		return returnVal;
 	}
 
-	@DeleteMapping("/delete/{customerId}")
-	public String delete(@PathVariable("customerId") int theId) {
-		// delete the book
-		customerServiceImpl.deleteById(theId);
-		return "redirect:/customers/list";
+	@RequestMapping("/delete") // Using @DeleteMapping is throwing 405 error code
+	public String delete(@RequestParam("customerId") int customerId) {
+		// delete the customer
+		customerServiceImpl.deleteById(customerId);
+		return "redirect:/customers/list"; // redirect to Customer List Page after operation
 	}
 
 }

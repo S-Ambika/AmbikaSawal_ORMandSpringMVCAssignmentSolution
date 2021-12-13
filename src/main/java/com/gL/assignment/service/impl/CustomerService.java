@@ -4,7 +4,9 @@ import java.util.List;
 
 import com.gL.assignment.model.Customer;
 
-
+/* Interface having all services required 
+ * to perform CRUD operations
+*/
 public interface CustomerService {
 	
 	List<Customer> findAll();

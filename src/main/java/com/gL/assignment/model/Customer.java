@@ -7,6 +7,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+/* Class that will get mapped with Database Table 
+ * ORM implementation by Hibernate
+ * Contains table name, columns 
+*/
 @Entity
 @Table(name = "customer")
 public class Customer {

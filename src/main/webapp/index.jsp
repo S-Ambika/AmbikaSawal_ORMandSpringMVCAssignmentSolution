@@ -7,8 +7,11 @@
 <title>Welcome Page.</title>
 
 </head>
-<body>
+
+<body style="background-color:lightblue;">
 <h1>Welcome To Customer Relationship Management</h1>
-<h2>Please change url to /customers/showFormForAdd</h2>
+<p style="color:blue">Please change url to /customers/list to view the customer directory</p>
+<p style="color:blue">Please change url to /customers/addCustomer to add the customer details</p>
+
 </body>
 </html>
